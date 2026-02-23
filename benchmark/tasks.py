@@ -293,22 +293,37 @@ class LikertContinuumWVSTask(Task):
         for row in rows:
             grouped[row["WVS question"]].append(row)
 
-        spearman_scores: list[float] = []
-        for question, q_rows in grouped.items():
+        # Collect all texts and build mapping of indices to questions
+        all_texts = []
+        question_indices: dict[str, list[int]] = defaultdict(list)
+        question_codes: dict[str, np.ndarray] = {}
 
+        for question, q_rows in grouped.items():
+            start_idx = len(all_texts)
             texts = [r["Statement"] for r in q_rows]
             codes = np.array([float(r["Code"]) for r in q_rows], dtype=np.float32)
 
-            embs = encode_with_cache(
-                model,
-                texts,
-                dataset_name=f"{self.name}__{question}",
-                cache_dir=cache_dir,
-                **kwargs,
-            )
+            all_texts.extend(texts)
+            question_indices[question] = list(range(start_idx, len(all_texts)))
+            question_codes[question] = codes
+
+        # Encode all texts at once
+        embs = encode_with_cache(
+            model,
+            all_texts,
+            dataset_name=self.name,
+            cache_dir=cache_dir,
+            **kwargs,
+        )
+
+        spearman_scores: list[float] = []
+        for question, indices in question_indices.items():
+            # Extract embeddings for this question
+            q_embs = embs[indices]
+            codes = question_codes[question]
 
             pca = PCA(n_components=1, random_state=42)
-            axis_values = pca.fit_transform(embs).reshape(-1)
+            axis_values = pca.fit_transform(q_embs).reshape(-1)
 
             rho = spearmanr(axis_values, codes).statistic
             if np.isnan(rho):
