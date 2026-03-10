@@ -1,0 +1,11 @@
+{
+  "model": "intfloat/multilingual-e5-small",
+  "task": "likert-wvs",
+  "num_rows": 914.0,
+  "num_questions": 149.0,
+  "spearman": 0.7570891077602487,
+  "main_score": 0.7570891077602487,
+  "encode_time_s": 0.0,
+  "eval_time_s": 0.156,
+  "timestamp": "2026-03-05T14:34:11.480467"
+}

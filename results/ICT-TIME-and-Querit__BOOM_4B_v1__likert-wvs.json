@@ -1,0 +1,11 @@
+{
+  "model": "ICT-TIME-and-Querit/BOOM_4B_v1",
+  "task": "likert-wvs",
+  "num_rows": 914.0,
+  "num_questions": 149.0,
+  "spearman": 0.7666201807141404,
+  "main_score": 0.7666201807141404,
+  "encode_time_s": 117.256,
+  "eval_time_s": 0.313,
+  "timestamp": "2026-03-05T15:08:30.161930"
+}

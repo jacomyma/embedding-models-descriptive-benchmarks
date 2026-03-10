@@ -1,0 +1,11 @@
+{
+  "model": "sentence-transformers/embeddinggemma-300m-medical",
+  "task": "likert-wvs",
+  "num_rows": 914.0,
+  "num_questions": 149.0,
+  "spearman": 0.7762209825968215,
+  "main_score": 0.7762209825968215,
+  "encode_time_s": 0.0,
+  "eval_time_s": 0.221,
+  "timestamp": "2026-03-05T14:34:12.171143"
+}

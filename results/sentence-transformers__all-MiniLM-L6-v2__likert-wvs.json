@@ -1,0 +1,11 @@
+{
+  "model": "sentence-transformers/all-MiniLM-L6-v2",
+  "task": "likert-wvs",
+  "num_rows": 914.0,
+  "num_questions": 149.0,
+  "spearman": 0.6944565501612481,
+  "main_score": 0.6944565501612481,
+  "encode_time_s": 5.218,
+  "eval_time_s": 0.181,
+  "timestamp": "2026-03-05T15:55:28.920356"
+}

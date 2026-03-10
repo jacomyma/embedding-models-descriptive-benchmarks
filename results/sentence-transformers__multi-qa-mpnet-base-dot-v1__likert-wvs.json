@@ -1,0 +1,11 @@
+{
+  "model": "sentence-transformers/multi-qa-mpnet-base-dot-v1",
+  "task": "likert-wvs",
+  "num_rows": 914.0,
+  "num_questions": 149.0,
+  "spearman": 0.6931767337807606,
+  "main_score": 0.6931767337807606,
+  "encode_time_s": 0.0,
+  "eval_time_s": 0.219,
+  "timestamp": "2026-03-05T14:34:12.614656"
+}

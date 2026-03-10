@@ -1,0 +1,11 @@
+{
+  "model": "intfloat/e5-mistral-7b-instruct",
+  "task": "likert-wvs",
+  "num_rows": 914.0,
+  "num_questions": 149.0,
+  "spearman": 0.7643685173886515,
+  "main_score": 0.7643685173886515,
+  "encode_time_s": 1401.758,
+  "eval_time_s": 0.327,
+  "timestamp": "2026-03-05T14:57:35.587899"
+}

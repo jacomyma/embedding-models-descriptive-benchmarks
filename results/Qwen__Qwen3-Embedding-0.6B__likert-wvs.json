@@ -1,0 +1,11 @@
+{
+  "model": "Qwen/Qwen3-Embedding-0.6B",
+  "task": "likert-wvs",
+  "num_rows": 914.0,
+  "num_questions": 149.0,
+  "spearman": 0.7194282227839274,
+  "main_score": 0.7194282227839274,
+  "encode_time_s": 39.869,
+  "eval_time_s": 0.257,
+  "timestamp": "2026-03-05T15:13:03.031338"
+}

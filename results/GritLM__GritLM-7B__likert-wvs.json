@@ -1,0 +1,11 @@
+{
+  "model": "GritLM/GritLM-7B",
+  "task": "likert-wvs",
+  "num_rows": 914.0,
+  "num_questions": 149.0,
+  "spearman": 0.6796987129201895,
+  "main_score": 0.6796987129201895,
+  "encode_time_s": 536.64,
+  "eval_time_s": 0.355,
+  "timestamp": "2026-03-05T15:06:32.587913"
+}

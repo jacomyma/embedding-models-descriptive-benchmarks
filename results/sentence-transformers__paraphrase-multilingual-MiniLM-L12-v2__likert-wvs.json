@@ -1,0 +1,11 @@
+{
+  "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "task": "likert-wvs",
+  "num_rows": 914.0,
+  "num_questions": 149.0,
+  "spearman": 0.7806400534588454,
+  "main_score": 0.7806400534588454,
+  "encode_time_s": 0.0,
+  "eval_time_s": 0.146,
+  "timestamp": "2026-03-05T14:34:12.986514"
+}

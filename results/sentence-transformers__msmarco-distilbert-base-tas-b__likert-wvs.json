@@ -1,0 +1,11 @@
+{
+  "model": "sentence-transformers/msmarco-distilbert-base-tas-b",
+  "task": "likert-wvs",
+  "num_rows": 914.0,
+  "num_questions": 149.0,
+  "spearman": 0.6906839245765419,
+  "main_score": 0.6906839245765419,
+  "encode_time_s": 0.0,
+  "eval_time_s": 0.223,
+  "timestamp": "2026-03-05T14:34:11.707075"
+}
