@@ -1,6 +1,6 @@
 *.pyc
 /.cache
-/results
+#/results
 
 # General
 .DS_Store
