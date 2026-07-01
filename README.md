@@ -1,10 +1,7 @@
 # Embedding Situational Benchmarks
 
-A lightweight, MTEB-inspired framework for comparing embedding models across tasks.
-
-## WORK IN PROGRESS!
-
-The code is currently being adapted to our own benchmarks.
+A lightweight, MTEB-inspired framework for evaluating how well embedding models capture
+graded, situational meaning — currently the WVS Likert-continuum benchmark.
 
 ## Structure
 
@@ -12,15 +9,17 @@ The code is currently being adapted to our own benchmarks.
 embedding_benchmark/
 │
 ├── data/
-│   └── ...            — our benchmark datasets
+│   └── WVS Statements.csv — World Values Survey statements + Likert codes
 │
 ├── benchmark/
 │   ├── __init__.py    — public API
-│   ├── models.py      — adapters (HuggingFace, OpenAI, …)
+│   ├── models.py      — adapters (HuggingFace/sentence-transformers)
 │   ├── tasks.py       — benchmark tasks
 │   ├── cache.py       — disk caching of embeddings
 │   └── runner.py      — orchestrator + result helpers
 │
+├── experiments/       — exploratory notebooks
+├── run-locally.ipynb  — run benchmark locally
 └── run-in-colab.ipynb — run benchmark in Google Colab
 ```
 
@@ -39,7 +38,7 @@ runner = BenchmarkRunner(
         {"type": "sentence_transformer", "model": "BAAI/bge-small-en-v1.5"},
         {"type": "sentence_transformer", "model": "sentence-transformers/all-MiniLM-L6-v2"},
     ],
-    task_names=["sts", "retrieval"],
+    task_names=["likert-wvs"],
     output_dir=Path("results"),
 )
 
@@ -48,11 +47,9 @@ results = runner.run()
 
 ## Built-in Tasks
 
-| Key           | Task class        | Metric         | Dataset             |
-|---------------|-------------------|----------------|---------------------|
-| `sts`         | `STSTask`         | Spearman ρ     | STS-Benchmark       |
-| `retrieval`   | `RetrievalTask`   | NDCG@10        | Synthetic (demo)    |
-| `clustering`  | `ClusteringTask`  | V-measure      | AG News (subsample) |
+| Key           | Task class               | Metric              | Dataset                |
+|---------------|---------------------------|---------------------|-------------------------|
+| `likert-wvs`  | `LikertContinuumWVSTask` | mean \|Spearman ρ\| | WVS Statements (`data/`) |
 
 
 ## Adding a Model
@@ -60,11 +57,7 @@ results = runner.run()
 Add a dict to `model_configs`:
 
 ```python
-# HuggingFace / sentence-transformers
 {"type": "sentence_transformer", "model": "intfloat/e5-large-v2", "device": "cuda"}
-
-# OpenAI (needs OPENAI_API_KEY)
-{"type": "openai", "model": "text-embedding-3-large", "dimensions": 1024}
 ```
 
 

@@ -40,113 +40,6 @@ class Task(abc.ABC):
 
 
 # ---------------------------------------------------------------------------
-# Semantic Textual Similarity (STS) - for demo purposes
-# ---------------------------------------------------------------------------
-
-@dataclass
-class STSTask(Task):
-    """
-    Pearson & Spearman correlation between cosine similarity and human scores.
-
-    Expects a HuggingFace dataset with columns: sentence1, sentence2, score.
-    The score column is assumed to be in [0, 5] and is normalized to [0, 1].
-
-    Default dataset: stsb (the classic STS-Benchmark).
-    """
-
-    name: str = "STS-B"
-    description: str = "Semantic Textual Similarity – STS-Benchmark"
-    hf_dataset: str = "sentence-transformers/stsb"
-    split: str = "test"
-    sentence1_col: str = "sentence1"
-    sentence2_col: str = "sentence2"
-    score_col: str = "score"
-    score_scale: float = 5.0   # divide scores by this to get [0,1]
-
-    def run(self, model, cache_dir: Path, **kwargs) -> dict[str, float]:
-        from datasets import load_dataset
-        from scipy.stats import pearsonr, spearmanr
-
-        logger.info(f"[{self.name}] Loading dataset {self.hf_dataset} …")
-        ds = load_dataset(self.hf_dataset, split=self.split)
-
-        s1 = list(ds[self.sentence1_col])
-        s2 = list(ds[self.sentence2_col])
-        labels = np.array(ds[self.score_col], dtype=np.float32) / self.score_scale
-
-        all_texts = s1 + s2
-        embs = encode_with_cache(
-            model, all_texts, dataset_name=self.name, cache_dir=cache_dir, **kwargs
-        )
-        embs1 = embs[: len(s1)]
-        embs2 = embs[len(s1) :]
-
-        # Cosine similarity (embeddings assumed normalized)
-        cos_sim = np.einsum("ij,ij->i", embs1, embs2)  # element-wise dot product
-
-        pearson = pearsonr(cos_sim, labels).statistic
-        spearman = spearmanr(cos_sim, labels).statistic
-
-        return {
-            "pearson": float(pearson),
-            "spearman": float(spearman),
-            "main_score": float(spearman),   # convention: always set main_score
-        }
-
-
-
-# ---------------------------------------------------------------------------
-# Clustering - for demo purposes
-# ---------------------------------------------------------------------------
-
-@dataclass
-class ClusteringTask(Task):
-    """
-    Evaluates how well embeddings cluster by class label.
-    Uses V-measure (harmonic mean of homogeneity and completeness).
-
-    Expects a HuggingFace dataset with `text` and `label` columns.
-    Default: 'ag_news' (4 categories of news).
-    """
-
-    name: str = "Clustering-AG-News"
-    description: str = "Clustering on AG News (4 categories)"
-    hf_dataset: str = "ag_news"
-    split: str = "test"
-    text_col: str = "text"
-    label_col: str = "label"
-    max_samples: int = 2000   # subsample to keep it fast
-
-    def run(self, model, cache_dir: Path, **kwargs) -> dict[str, float]:
-        from datasets import load_dataset
-        from sklearn.cluster import MiniBatchKMeans
-        from sklearn.metrics import v_measure_score
-
-        logger.info(f"[{self.name}] Loading dataset {self.hf_dataset} …")
-        ds = load_dataset(self.hf_dataset, split=self.split)
-
-        if len(ds) > self.max_samples:
-            ds = ds.shuffle(seed=42).select(range(self.max_samples))
-
-        texts = list(ds[self.text_col])
-        labels = list(ds[self.label_col])
-        n_clusters = len(set(labels))
-
-        embs = encode_with_cache(
-            model, texts, dataset_name=self.name, cache_dir=cache_dir, **kwargs
-        )
-
-        kmeans = MiniBatchKMeans(n_clusters=n_clusters, random_state=42, n_init=5)
-        pred_labels = kmeans.fit_predict(embs)
-        v_score = v_measure_score(labels, pred_labels)
-
-        return {
-            "v_measure": float(v_score),
-            "main_score": float(v_score),
-        }
-
-
-# ---------------------------------------------------------------------------
 # Likert Continuum (WVS)
 # ---------------------------------------------------------------------------
 
@@ -242,9 +135,6 @@ class LikertContinuumWVSTask(Task):
 # ---------------------------------------------------------------------------
 
 TASK_REGISTRY: dict[str, Task] = {
-    "sts": STSTask(),
-    "retrieval": RetrievalTask(),
-    "clustering": ClusteringTask(),
     "likert-wvs": LikertContinuumWVSTask(),
 }
 

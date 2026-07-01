@@ -111,56 +111,6 @@ class SentenceTransformerModel(EmbeddingModel):
 
 
 # ---------------------------------------------------------------------------
-# OpenAI API adapter  (optional — only needed if you want to benchmark API models)
-# ---------------------------------------------------------------------------
-
-@dataclass
-class OpenAIEmbeddingModel(EmbeddingModel):
-    """
-    Wraps the OpenAI embeddings endpoint.
-
-    Requires: pip install openai
-    Set OPENAI_API_KEY in your environment.
-    """
-
-    model_name_or_path: str = "text-embedding-3-small"
-    dimensions: Optional[int] = None   # pass None to use model default
-
-    def __post_init__(self):
-        self.name = self.model_name_or_path
-
-    def encode(
-        self,
-        texts: list[str],
-        batch_size: int = 512,      # OpenAI supports large batches
-        show_progress: bool = True,
-    ) -> np.ndarray:
-        try:
-            from openai import OpenAI
-        except ImportError:
-            raise ImportError("pip install openai")
-
-        from tqdm import tqdm
-
-        client = OpenAI()
-        all_embeddings = []
-        batches = [texts[i : i + batch_size] for i in range(0, len(texts), batch_size)]
-
-        for batch in tqdm(batches, disable=not show_progress, desc=self.name):
-            kwargs = dict(input=batch, model=self.model_name_or_path)
-            if self.dimensions:
-                kwargs["dimensions"] = self.dimensions
-            response = client.embeddings.create(**kwargs)
-            vecs = [d.embedding for d in response.data]
-            all_embeddings.extend(vecs)
-
-        arr = np.array(all_embeddings, dtype=np.float32)
-        # L2-normalize
-        norms = np.linalg.norm(arr, axis=1, keepdims=True)
-        return arr / np.maximum(norms, 1e-9)
-
-
-# ---------------------------------------------------------------------------
 # Factory
 # ---------------------------------------------------------------------------
 
@@ -168,9 +118,8 @@ def load_model(cfg: dict) -> EmbeddingModel:
     """
     Instantiate an EmbeddingModel from a plain config dict.
 
-    Example configs:
+    Example config:
         {"type": "sentence_transformer", "model": "BAAI/bge-small-en-v1.5"}
-        {"type": "openai",               "model": "text-embedding-3-small"}
     """
     kind = cfg.get("type", "sentence_transformer")
 
@@ -181,11 +130,6 @@ def load_model(cfg: dict) -> EmbeddingModel:
             normalize=cfg.get("normalize", True),
             trust_remote_code=cfg.get("trust_remote_code", False),
             encode_kwargs=cfg.get("encode_kwargs", {}),
-        )
-    elif kind == "openai":
-        return OpenAIEmbeddingModel(
-            model_name_or_path=cfg.get("model", "text-embedding-3-small"),
-            dimensions=cfg.get("dimensions"),
         )
     else:
         raise ValueError(f"Unknown model type: {kind!r}")
